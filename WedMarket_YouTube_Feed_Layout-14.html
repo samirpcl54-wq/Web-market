@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>WedMarket — Wedding Services Feed</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,Inter,sans-serif;color:#0f0f0f;background:#fff}
+button,input,select{font:inherit}button{cursor:pointer;border:0}
+.header{height:64px;border-bottom:1px solid #eee;display:flex;align-items:center;gap:18px;padding:0 20px;position:sticky;top:0;background:#fff;z-index:100}
+.logo{font-size:23px;font-weight:900;color:#e21b23;white-space:nowrap}
+.menu{background:none;font-size:23px}
+.search{height:42px;display:flex;max-width:650px;flex:1;margin:auto}
+.search input{flex:1;border:1px solid #ccc;border-right:0;border-radius:22px 0 0 22px;padding:0 18px;outline:0}
+.search button{width:60px;border:1px solid #ccc;border-radius:0 22px 22px 0;background:#f8f8f8}
+.headBtns{display:flex;gap:8px}.headBtns button{padding:10px 14px;border-radius:22px;background:#f2f2f2;font-weight:700}
+.layout{display:flex}
+.sidebar{width:225px;position:sticky;top:64px;height:calc(100vh - 64px);border-right:1px solid #eee;padding:14px 10px;overflow:auto}
+.side{padding:12px 15px;border-radius:10px;font-weight:600;font-size:14px;margin:2px 0}.side:hover,.side.active{background:#f2f2f2}
+.sideTitle{font-size:12px;color:#777;padding:18px 15px 7px;text-transform:uppercase}
+.main{flex:1;max-width:1080px;margin:auto;padding:18px 28px 70px}
+.chips{display:flex;gap:9px;overflow:auto;padding:0 0 18px;position:sticky;top:64px;background:#fff;z-index:20}
+.chip{white-space:nowrap;padding:9px 15px;border-radius:9px;background:#f2f2f2;font-weight:700;font-size:13px}.chip.active{background:#111;color:#fff}
+.heading{font-size:21px;margin:6px 0 18px}
+.feed{max-width:900px;margin:auto}
+.feed{max-width:none;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:34px 34px}
+.item{margin:0;display:block;min-width:0}
+.item .info{padding:12px 4px 7px}
+.item .actions{margin:0;display:flex;flex-direction:row;flex-wrap:nowrap;gap:8px;width:100%;align-items:center}
+.item .actions button{width:auto;flex:1 1 0;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.item .divider{display:none}
+.thumb{width:100%;aspect-ratio:0.70;border-radius:28px;overflow:hidden;position:relative;background:#ddd}
+.thumb img{width:100%;height:100%;object-fit:cover}
+.play{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:#000b;color:#fff;width:58px;height:58px;border-radius:50%;display:grid;place-items:center;font-size:25px}
+.verified{position:absolute;top:12px;left:12px;background:#e21b23;color:white;padding:5px 9px;border-radius:5px;font-size:10px;font-weight:800}
+.price{position:absolute;right:10px;bottom:10px;background:#000d;color:#fff;padding:6px 9px;border-radius:5px;font-weight:800}
+.info{display:flex;gap:11px;padding:11px 3px 6px}.avatar{width:43px;height:43px;border-radius:50%;background:#222;color:#fff;display:grid;place-items:center;font-weight:900;flex:none}
+.title{font-size:18px;font-weight:800;line-height:1.35}.provider,.meta{color:#666;font-size:13px;margin-top:4px}.tick{font-size:9px;background:#111;color:#fff;border-radius:50%;padding:2px 4px}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-left:56px}.actions button{background:#f2f2f2;padding:9px 13px;border-radius:20px;font-size:12px;font-weight:800}.actions .book{background:#e21b23;color:#fff}.actions .earn{background:#e8f7ed;color:#087a35}
+.divider{display:none}
+.bottom{display:none}
+.modal{display:none;position:fixed;inset:0;background:#0009;z-index:500;align-items:center;justify-content:center;padding:18px}
+.box{background:#fff;border-radius:16px;padding:22px;width:min(620px,100%);max-height:90vh;overflow:auto}
+.close{float:right;width:34px;height:34px;border-radius:50%;background:#eee}
+.field{margin:13px 0}.field label{display:block;font-size:12px;font-weight:800;margin-bottom:6px}.field input,.field select{width:100%;height:44px;border:1px solid #ddd;border-radius:8px;padding:0 12px}
+.primary{background:#e21b23;color:#fff;padding:12px 18px;border-radius:22px;font-weight:800}
+.calendar{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-top:15px}.calendar button{padding:10px 2px;background:#f2f2f2;border-radius:7px}.calendar .booked{background:#111;color:#fff}
+@media(max-width:800px){
+.header{height:58px;padding:0 11px;gap:9px}.logo{font-size:19px}.headBtns{display:none}.sidebar{display:none}.main{padding:10px 0 75px}.chips{top:58px;padding:4px 12px 14px}.heading{padding:0 12px;font-size:19px}.feed{display:grid;grid-template-columns:1fr;gap:24px;padding:0 12px}
+.item{display:block;padding:0;margin:0}
+.thumb{width:100%;aspect-ratio:0.70;border-radius:22px}
+.info{padding:10px 2px 6px}
+.title{font-size:15px}
+.provider,.meta{font-size:11px}
+.avatar{width:36px;height:36px;font-size:12px}
+.actions{margin:0;display:flex;flex-direction:row;flex-wrap:nowrap;gap:6px;width:100%;align-items:center}
+.actions button{flex:1 1 0;width:auto;min-width:0;font-size:10px;padding:8px 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.bottom{position:fixed;display:flex;bottom:0;left:0;right:0;height:62px;background:#fff;border-top:1px solid #ddd;z-index:400;justify-content:space-around}.bottom button{background:none;font-size:10px;font-weight:700;display:flex;flex-direction:column;gap:4px;align-items:center;justify-content:center}
+}
+
+@media(min-width:801px) and (max-width:1050px){
+.feed{gap:24px 20px}
+}
+</style>
+</head>
+<body>
+<header class="header">
+<button class="menu" onclick="toggleSide()">☰</button>
+<div class="logo">WedMarket</div>
+<div class="search"><input id="search" placeholder="Search wedding services..." oninput="render()"><button onclick="render()">🔍</button></div>
+<div class="headBtns"><button onclick="openProvider()">＋ Post Service</button><button onclick="openLogin()">Sign in</button></div>
+</header>
+
+<div class="layout">
+<aside class="sidebar" id="sidebar">
+<div class="side active" onclick="cat('All')">🏠 Home</div>
+<div class="side" onclick="cat('Trending')">🔥 Trending</div>
+<div class="side" onclick="cat('Nearby')">📍 Nearby</div>
+<div class="sideTitle">Explore</div>
+<div class="side" onclick="cat('All')">✨ All Services</div>
+<div class="side" onclick="cat('Singer')">🎤 Singers</div>
+<div class="side" onclick="cat('Musician')">🎸 Musicians</div>
+<div class="side" onclick="cat('Wedding Car')">🚘 Wedding Cars</div>
+<div class="side" onclick="cat('Photography')">📸 Photography</div>
+<div class="side" onclick="cat('Makeup')">💄 Makeup</div>
+<div class="side" onclick="cat('DJ')">🎧 DJ & Sound</div>
+<div class="side" onclick="cat('Decoration')">🌸 Decoration</div>
+<div class="sideTitle">You</div>
+<div class="side" onclick="bookings()">📅 My Bookings</div>
+<div class="side" onclick="rewards()">💰 Rewards</div>
+<div class="side" onclick="openProvider()">👤 Profile / Provider</div>
+</aside>
+
+<main class="main">
+<div class="chips" id="chips">
+<button class="chip active" onclick="cat('All')">All</button>
+<button class="chip" onclick="cat('Singer')">Singers</button>
+<button class="chip" onclick="cat('Musician')">Musicians</button>
+<button class="chip" onclick="cat('Wedding Car')">Wedding Cars</button>
+<button class="chip" onclick="cat('Photography')">Photography</button>
+<button class="chip" onclick="cat('Makeup')">Makeup</button>
+<button class="chip" onclick="cat('DJ')">DJ</button>
+<button class="chip" onclick="cat('Decoration')">Decoration</button>
+</div>
+<h1 class="heading">Recommended wedding services</h1>
+<section class="feed" id="feed"></section>
+</main>
+</div>
+
+<nav class="bottom">
+<button onclick="cat('All')">⌂<span>Home</span></button>
+<button onclick="document.getElementById('search').focus()">⌕<span>Explore</span></button>
+<button onclick="openProvider()">＋<span>Post</span></button>
+<button onclick="bookings()">▣<span>Bookings</span></button>
+<button onclick="openLogin()">●<span>Profile</span></button>
+</nav>
+
+<div class="modal" id="modal"><div class="box"><button class="close" onclick="closeM()">×</button><div id="modalBody"></div></div></div>
+
+<script>
+let current='All';
+const imgs=[
+'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1400&q=80',
+'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&w=1400&q=80',
+'https://images.unsplash.com/photo-1516280440614-37939bbacd81?auto=format&fit=crop&w=1400&q=80',
+'https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?auto=format&fit=crop&w=1400&q=80',
+'https://images.unsplash.com/photo-1519225421980-715cb0215aed?auto=format&fit=crop&w=1400&q=80',
+'https://images.unsplash.com/photo-1571266028243-d220c9c3b6f4?auto=format&fit=crop&w=1400&q=80'
+];
+let services=[
+{id:1,n:'Cinematic Wedding Photography',p:'Frame Story',c:'Photography',l:'Patna',price:15000,r:4.9,img:imgs[0]},
+{id:2,n:'Luxury Wedding Car for Baraat',p:'Royal Cars',c:'Wedding Car',l:'Patna',price:8000,r:4.8,img:imgs[1]},
+{id:3,n:'Professional Wedding Singer',p:'Royal Voice Studio',c:'Singer',l:'Patna',price:5000,r:4.9,img:imgs[2]},
+{id:4,n:'Bridal Makeup Artist',p:'Glow Bridal Studio',c:'Makeup',l:'Patna',price:7000,r:4.8,img:imgs[3]},
+{id:5,n:'Premium Wedding Decoration',p:'Royal Decor',c:'Decoration',l:'Patna',price:12000,r:4.9,img:imgs[4]},
+{id:6,n:'DJ, Sound & Wedding Lights',p:'Beat House',c:'DJ',l:'Patna',price:9000,r:4.7,img:imgs[5]}
+];
+function cat(c){current=c;document.querySelectorAll('.chip').forEach(x=>x.classList.toggle('active',c==='All'?x.textContent==='All':x.textContent.toLowerCase().includes(c.toLowerCase())));render()}
+function render(){
+ let q=document.getElementById('search').value.toLowerCase();
+ let list=services.filter(s=>(current==='All'||current==='Trending'||current==='Nearby'||s.c===current)&&(!q||`${s.n} ${s.p} ${s.c} ${s.l}`.toLowerCase().includes(q)));
+ document.getElementById('feed').innerHTML=list.map(s=>`
+ <article class="item">
+  <div class="thumb" onclick="details(${s.id})"><img src="${s.img}"><span class="verified">VERIFIED</span><span class="play">▶</span><span class="price">₹${s.price.toLocaleString()}</span></div>
+  <div class="info"><div class="avatar">${s.p[0]}</div><div><div class="title">${s.n}</div><div class="provider">${s.p} <span class="tick">✓</span></div><div class="meta">📍 ${s.l} · ⭐ ${s.r} · Wedding service</div></div></div>
+  <div class="actions"><button class="book" onclick="booking(${s.id})">📅 Book</button><button onclick="calendar(${s.id})">🗓 Calendar</button><button class="earn" onclick="share(${s.id})">🔗 Share & Earn 2%</button><button onclick="details(${s.id})">More</button></div>
+  <div class="divider"></div>
+ </article>`).join('')||'<p style="padding:40px;text-align:center;color:#777">No services found.</p>';
+}
+function get(id){return services.find(x=>x.id===id)}
+function show(x){document.getElementById('modalBody').innerHTML=x;document.getElementById('modal').style.display='flex'}
+function closeM(){document.getElementById('modal').style.display='none'}
+function details(id){let s=get(id);show(`<img src="${s.img}" style="width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:12px"><h2 style="margin-top:15px">${s.n}</h2><p style="color:#666;margin:7px 0">${s.p} · 📍 ${s.l}</p><h2>₹${s.price.toLocaleString()}</h2><br><button class="primary" onclick="booking(${id})">Book — 10% Advance</button> <button style="padding:12px;border-radius:22px" onclick="share(${id})">🔗 Share & Earn 2%</button>`)}
+function booking(id){let s=get(id),min=new Date().toISOString().slice(0,10);show(`<h2>Book ${s.n}</h2><p style="color:#666;margin:8px 0">${s.p}</p><div class="field"><label>Event date</label><input type="date" id="date" min="${min}"></div><p>10% advance: <b>₹${Math.round(s.price*.1).toLocaleString()}</b></p><br><button class="primary" onclick="confirmBook(${id})">Pay 10% & Confirm</button>`)}
+function confirmBook(id){let d=document.getElementById('date').value;if(!d)return alert('Please select event date.');let a=JSON.parse(localStorage.bookings||'[]');if(a.some(x=>x.id===id&&x.d===d))return alert('This date is already booked.');a.push({id,d,amount:Math.round(get(id).price*.1)});localStorage.bookings=JSON.stringify(a);closeM();alert('Demo payment successful. Booking confirmed.')}
+function calendar(id){let s=get(id),a=JSON.parse(localStorage.bookings||'[]');let now=new Date();let cells='';for(let i=0;i<30;i++){let d=new Date(now);d.setDate(now.getDate()+i);let ds=d.toISOString().slice(0,10),b=a.some(x=>x.id===id&&x.d===ds);cells+=`<button class="${b?'booked':''}">${d.getDate()}<br><small>${d.toLocaleString('en',{month:'short'})}</small></button>`}show(`<h2>${s.n} — Calendar</h2><p style="color:#666">Booked dates are black.</p><div class="calendar">${cells}</div>`)}
+function share(id){let s=get(id),code='WM'+Math.random().toString(36).slice(2,8).toUpperCase(),link=location.href.split('?')[0]+'?service='+id+'&ref='+code;if(navigator.share)navigator.share({title:'WedMarket',text:s.n+' by '+s.p,url:link});else navigator.clipboard?.writeText(link).then(()=>alert('Referral link copied. Successful eligible booking earns 2%.'))}
+function openLogin(){show(`<h2>Sign in to WedMarket</h2><div class="field"><label>Mobile / Email</label><input placeholder="Enter mobile or email"></div><button class="primary" onclick="closeM()">Continue</button>`)}
+function openProvider(){show(`<h2>Post Your Wedding Service</h2><p style="color:#666;margin:10px 0">Your service will need admin approval before appearing publicly.</p><div class="field"><label>Service name</label><input id="pn"></div><div class="field"><label>Category</label><select id="pc"><option>Singer</option><option>Musician</option><option>Wedding Car</option><option>Photography</option><option>Makeup</option><option>DJ</option><option>Decoration</option></select></div><div class="field"><label>Price</label><input id="pp" type="number"></div><button class="primary" onclick="addService()">Submit Service</button>`)}
+function addService(){let n=document.getElementById('pn').value||'New Wedding Service';services.unshift({id:Date.now(),n,p:'New Provider',c:document.getElementById('pc').value,l:'India',price:Number(document.getElementById('pp').value||0),r:5,img:imgs[0]});closeM();render()}
+function bookings(){let a=JSON.parse(localStorage.bookings||'[]');show(`<h2>📅 My Bookings</h2><div style="margin-top:15px">${a.length?a.map(x=>`<p style="padding:12px 0;border-bottom:1px solid #eee"><b>Booking</b> · ${x.d} · ₹${x.amount}</p>`).join(''):'<p style="color:#777;margin-top:15px">No bookings yet.</p>'}</div>`)}
+function rewards(){show(`<h2>💰 Rewards</h2><h1 style="margin:18px 0">₹0</h1><p style="color:#666">Share service links and earn 2% on eligible completed bookings.</p>`)}
+function toggleSide(){document.getElementById('sidebar').style.display=document.getElementById('sidebar').style.display==='none'?'block':'none'}
+render();
+</script>
+</body>
+</html>
